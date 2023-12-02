@@ -6,13 +6,17 @@ const int c_red = 12;
 const int c_green = 13;
 const int c_blue = 14;
 
+int current_r_max = 0;
+int current_g_max = 0;
+int current_b_max = 0;
+
 
 int check_valid_number(char *a_set){
     int len = strlen(a_set);
     int r = 0;
     int g = 0;
     int b = 0;
-    char number[3];
+    char number[4];
     int c = 0;
     for(int i = 0; i < len; i++){
         if(isdigit(a_set[i])){
@@ -35,8 +39,18 @@ int check_valid_number(char *a_set){
             number[0] = '\0';
             number[1] = '\0';
             number[2] = '\0';
+            number[3] = '\0';
         }
     }
+
+    if(r > current_r_max)
+        current_r_max = r;
+    if(g > current_g_max)
+        current_g_max = g;
+    if(b > current_b_max){
+        current_b_max = b;
+    }
+    
     if(r > c_red)
         return -1;
     if(g > c_green)
@@ -49,14 +63,13 @@ int check_valid_number(char *a_set){
 int process_line(char *a_line){
     char* token = strtok(a_line, ":");
     token = strtok(NULL, ";");
-    int ret = 0;
+    int ret = 1;
     while (token != NULL) {
-        ret = check_valid_number(token);
-        if(ret == -1)
-            return -1;
+        if(check_valid_number(token) == -1)
+            ret = -1;
         token = strtok(NULL, ";");
     }
-    return 1;
+    return ret;
 }
 
 int main(){
@@ -65,16 +78,22 @@ int main(){
     size_t size = 0;
     int i = 1;
 
-    int sum = 0;
+    int sum1 = 0;
+    int sum2 = 0;
 
     while(getline(&line, &size, stdin) != -1){
         if(process_line(line) == 1){
-            sum += i;
+            sum1 += i;
         }
+        sum2 += current_r_max * current_g_max * current_b_max;
+        current_r_max = 0;
+        current_g_max = 0;
+        current_b_max = 0;
         i++;
     }
 
-    printf("sum: %d\n", sum);
+    printf("sum:   %d\n", sum1);
+    printf("power: %d\n", sum2);
 
 
     return 0;
