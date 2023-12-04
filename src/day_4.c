@@ -60,7 +60,14 @@ int main(){
     int len = 0;
 
     int sum1 = 0;
+    int sum2 = 0;
     int ret = 0;
+
+    int instances[220];
+
+    for(int j = 0; j < 220; j++){
+        instances[j] = 1;
+    }
 
     while(getline(&line, &size, stdin) != -1){
         get_digits(line, &cards[0], &you[0]);
@@ -75,12 +82,20 @@ int main(){
 
         ret = matching(&cards[0], &you[0]);
         if(ret)
-            sum1 += 1 << ret - 1;
+            sum1 += 1 << (ret - 1);
+
+        for(int j = 0; j < ret && j < 219; j++){
+            instances[i + j + 1] += instances[i];
+        }
+
+        sum2 += instances[i];
+
         printf("%d\n", ret);
         i++;
     }
 
     printf("sum1: %d\n", sum1);
+    printf("sum2: %d\n", sum2);
 
     return 0;
 }
