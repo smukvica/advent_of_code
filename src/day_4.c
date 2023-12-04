@@ -50,7 +50,6 @@ int get_digits(const char *a_line, int *a_cards, int *a_you){
 }
 
 int main(){
-
     int cards[c_cards_amount];
     int you[c_you_amount];
 
@@ -71,15 +70,6 @@ int main(){
 
     while(getline(&line, &size, stdin) != -1){
         get_digits(line, &cards[0], &you[0]);
-        for(int j = 0; j < c_cards_amount; j++){
-            printf("%2d ", cards[j]);
-        }
-        printf("| ");
-        for(int j = 0; j < c_you_amount; j++){
-            printf("%2d ", you[j]);
-        }
-        printf("\n");
-
         ret = matching(&cards[0], &you[0]);
         if(ret)
             sum1 += 1 << (ret - 1);
@@ -89,8 +79,6 @@ int main(){
         }
 
         sum2 += instances[i];
-
-        printf("%d\n", ret);
         i++;
     }
 
