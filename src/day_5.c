@@ -91,7 +91,6 @@ int main(){
     int k = 1;
     int ret = 0;
     int m = -1;
-    uint64_t temp = 69;
     while(k < i){
         ret = get_map(lines[k]);
         if(ret != 0){
@@ -125,7 +124,37 @@ int main(){
         }
     }
 
+
+
+    uint64_t pairs = 0xFFFFFFFFFFFFFFFF;
+    uint64_t s1 = 0;
+    uint64_t s2 = 0;
+    uint64_t smallest_range = 0xFFFFFFFFFFFFFFFF;
+    for(int s = 0; s < seed_amount; s += 2){
+        s1 = seeds[s];
+        s2 = 0;
+        smallest_range = 0xFFFFFFFFFFFFFFFF;
+        while(s1 < seeds[s] + seeds[s+1]){
+            for(i = 0; i < 7; i++){
+                for(m = 0; m < map_sizes[i]; m++){
+                    if(maps[i][m][1] <= s1 && maps[i][m][1] + maps[i][m][2] > s1){
+                        if(maps[i][m][2] - (s1 - maps[i][m][1]) < smallest_range)
+                            smallest_range = maps[i][m][2] - (s1 - maps[i][m][1]);
+                        s1 = maps[i][m][0] + (s1 - maps[i][m][1]);
+                        break;
+                    }
+                }
+            }
+            if(s1 < pairs){
+                pairs = s1;
+            }
+            s2 += smallest_range;
+            s1 = seeds[s] + s2;
+        }
+    }
+
     printf("lowest solo:  %lu\n", solo);
+    printf("lowest pairs: %lu\n", pairs);
 
     return 0;
 
