@@ -42,7 +42,8 @@ int main(){
 
     scanf("Time: %d %d %d %d\n", &times[0], &times[1], &times[2], &times[3]);
 
-    scanf("Distance: %d %d %d %d\n", &distances[0], &distances[1], &distances[2], &distances[3]);
+    scanf("Distance: %d %d %d %d\n", &distances[0], &distances[1], 
+                                     &distances[2], &distances[3]);
 
     
 
