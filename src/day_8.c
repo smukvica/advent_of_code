@@ -79,8 +79,6 @@ node construct_node_index(const char a_lines[1000][20], int a_index, int a_num){
 
     get_names_from_line(line, &n.name[0], &l[0], &r[0]);
 
-    //printf("%s = (%s, %s)\n", n.name, l, r);
-
     for(int i = 0; i < a_num; i++){
         strcpy(line, a_lines[i + 2]);
         line[3] = '\0';
@@ -111,7 +109,6 @@ int main(){
             strcpy(lines[i], line);
         i++;
     }
-    //printf("%d\n", i);
 
     num_of_nodes = i - 2;
 
