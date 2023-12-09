@@ -2,8 +2,8 @@
 #include <string.h>
 #include <ctype.h>
 
-const int numbers_in_line = 6;
-const int number_of_lines = 3;
+const int numbers_in_line = 21;
+const int number_of_lines = 200;
 
 int get_next_number(const char *a_line, int *a_index){
 
@@ -63,16 +63,26 @@ int main(){
         i++;
     }
 
-    unsigned int sum = 0;
+    int sum1 = 0;
     for(i = 0; i < number_of_lines; i++){
         int temp = 0;
         for(int j = history_depth[i] - 1; j > 0; j--){
             temp += history[i][j-1][numbers_in_line - j];
         }
-        sum += temp;
+        sum1 += temp;
     }
 
-    printf("sum: %d\n", sum);
+    int sum2 = 0;
+    for(i = 0; i < number_of_lines; i++){
+        int temp = 0;
+        for(int j = history_depth[i] - 1; j > 0; j--){
+            temp = history[i][j-1][0] - temp;
+        }
+        sum2 += temp;
+    }
+
+    printf("sum1: %d\n", sum1);
+    printf("sum2: %d\n", sum2);
 
     return 0;
 }
