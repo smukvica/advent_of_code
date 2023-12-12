@@ -89,10 +89,109 @@ void calculate_distances(const char *a_map, int *a_distances,
     }
 }
 
+int possible_directions(const char a_pipe, int a_dir_x, int a_dir_y){
+    if(a_pipe == c_west_south)
+        if(a_dir_x == -1 || a_dir_y == 1)
+            return 1;
+    if(a_pipe == c_west_east)// = '-';
+        if(a_dir_x == 1 || a_dir_x == -1)
+            return 1;
+    if(a_pipe == c_west_north)
+        if(a_dir_x == -1 || a_dir_y == -1)
+            return 1;
+    if(a_pipe == c_north_south)
+        if(a_dir_y == 1 || a_dir_y == -1)
+            return 1;
+    if(a_pipe == c_east_south)
+        if(a_dir_x == 1 || a_dir_y == 1)
+            return 1;
+    if(a_pipe == c_east_north)
+        if(a_dir_x == 1 || a_dir_y == -1)
+            return 1;
+    return 0;
+}
+
+void flood_fill(char *a_expanded_map, int a_start_x, int a_start_y){
+    
+    if(a_expanded_map[a_start_y * c_width * 3 + a_start_x] != '.')
+        return;
+    a_expanded_map[a_start_y * c_width * 3 + a_start_x] = 'O';
+    for(int i = 0; i < 4; i++){
+        int dir_x = surroundings_x[i];
+        int dir_y = surroundings_y[i];
+        if(a_start_x + dir_x < 0 || a_start_x + dir_x >= c_height * 3)
+            continue;
+        if(a_start_y + dir_y < 0 || a_start_y + dir_y >= c_width * 3)
+            continue;
+        if(a_expanded_map[(a_start_y + dir_y) * c_width * 3 + a_start_x + dir_x] != '.')
+            continue;
+        flood_fill(a_expanded_map, a_start_x + dir_x, a_start_y + dir_y);
+    }
+}
+
+int expand_map(char *a_map, int *a_distances, char *a_expanded_map){
+    // remove pipes not in loop
+    for(int i = 0; i < c_width * c_height; i++){
+        if(a_distances[i] < 0)
+            a_map[i] = '.';
+    }
+
+    // expand the map
+    for(int i = 0; i < c_height * 3; i++){
+        for(int j = 0; j < c_width * 3; j++){
+            if(i % 3 == 0 && j % 3 == 0)
+                a_expanded_map[i * c_height * 3 + j] = a_map[i / 3 * c_height + j / 3];
+            else
+                a_expanded_map[i * c_height * 3 + j] = '.';
+        }
+    }
+
+    // fill expanded map with pipes - #
+    for(int i = 0; i < c_height * 3; i++){
+        for(int j = 0; j < c_width * 3; j++){
+            if(a_expanded_map[i * c_width * 3 + j] == '.')
+                continue;
+            if(a_expanded_map[i * c_width * 3 + j] == 'S')
+                for(int k = 0; k < 4; k++){
+                    if(a_expanded_map[(i+surroundings_y[k]*3) * c_width * 3 + j + surroundings_x[k]*3] != '.'){
+                        a_expanded_map[(i + surroundings_y[k]) * (c_width * 3) + (surroundings_x[k] + j)] = '#';
+                    }
+                }
+            for(int k = 0; k < 4; k++){
+                if(possible_directions(a_expanded_map[i * c_width * 3 + j], 
+                                surroundings_x[k], 
+                                surroundings_y[k])){
+                    a_expanded_map[(i + surroundings_y[k]) * (c_width * 3) + (surroundings_x[k] + j)] = '#';
+                }
+            }
+        }
+    }
+
+    flood_fill(a_expanded_map, 0, 0);
+    int inside = 0;
+    for(int i = 1; i < c_height * 3; i += 3){
+        for(int j = 1; j < c_width * 3; j += 3){
+            if(a_expanded_map[i * c_width * 3 + j] == '.'){
+                int c = 0;
+                for(int x = -1; x <= 1; x++){
+                    for(int y = -1; y <= 1; y++){
+                        if(a_expanded_map[(i+y) * c_width * 3 + (j+x)] == '.')
+                            c++;
+                    }
+                }
+                if(c == 9)
+                    inside++;
+            }
+        }
+    }
+    return inside;
+}
+
 int main(){
 
     int distances[c_width * c_height];
     char map[c_width * c_height];
+    char expanded_map[c_width * 3 * c_height * 3];
     for(int i = 0; i < c_width * c_height; i++){
         distances[i] = -1;
     }
@@ -115,13 +214,23 @@ int main(){
     for(int i = 0; i < c_width * c_height; i++){
         if(distances[i] > farthest)
             farthest = distances[i];
-        printf("%5d ", distances[i]);
-        if((i+1) % c_width == 0)
+        //printf("%5d ", distances[i]);
+        //if((i+1) % c_width == 0)
+        //    printf("\n");
+    }
+
+    int inside = expand_map(map, distances, expanded_map);
+    
+    for(int i = 0; i < c_width * c_height * 3 * 3; i++){
+        printf("%c", expanded_map[i]);
+        if((i+1) % (c_width * 3) == 0)
             printf("\n");
     }
 
+    
+    
     printf("farthest: %d\n", farthest);
-
+    printf("inside: %d\n", inside);
 
     return 0;
 }
